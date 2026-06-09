@@ -1,0 +1,36 @@
+backend/
+│
+├── config/
+│   └── db.js                # الاتصال بقاعدة البيانات (MongoDB)
+│
+├── models/                  # الـ Schemas اللي عملناها سوا
+│   ├── userModel.js
+│   ├── productModel.js
+│   ├── categoryModel.js
+│   ├── cartModel.js
+│   ├── addressModel.js
+│   └── orderModel.js
+│
+├── controllers/             # الـ Logic والتحكم (الدماغ بتاعة المشروع)
+│   ├── authController.js
+│   ├── categoryController.js
+│   ├── productController.js
+│   ├── cartController.js
+│   ├── addressController.js
+│   └── orderController.js
+│
+├── routes/                  # نقط الاتصال (End points) اللي الـ Frontend بيكلمها
+│   ├── authRoutes.js
+│   ├── categoryRoutes.js
+│   ├── productRoutes.js
+│   ├── cartRoutes.js
+│   ├── addressRoutes.js
+│   └── orderRoutes.js
+│
+├── middlewares/             # حراس البوابة (الأمان والتحقق)
+│   ├── authMiddleware.js    # التأكد إن المستخدم مسجل دخول (Protect Routes)
+│   └── errorMiddleware.js   # التعامل مع الأخطاء (Global Error Handler)
+│
+├── .env                     # المتغيرات البيئية (الـ Ports، ومفاتيح الـ JWT، وبوابات الدفع)
+├── server.js                # نقطة الانطلاق الأساسية للمشروع (Entry Point)
+└── package.json
