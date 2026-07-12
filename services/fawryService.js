@@ -1,61 +1,67 @@
-import 'dotenv/config';
 import crypto from "crypto";
 import axios from "axios";
-import { PAYMENT_METHODS } from "../config/constants.js"; 
 
-const generateHash = (string) => crypto.createHash("sha256").update(string).digest("hex");
-
-const handleRefNumPayment = async (order, cart) => {
+/**
+ * دالة مستقلة لعمل طلب دفع بكود فوري
+ * @param {Object} data - بيانات الطالب والطلب والأكواد السرية
+ */
+export const createFawryRefNumberPayment = async (data) => {
     try {
-        const merchantCode = process.env.FAWRY_MERCHANT_CODE;
-        const secureKey = process.env.FAWRY_SECURE_KEY;
-        const fawryMethod = "PAYATFAWRY"; 
-        
-        const formattedAmount = order.totalPrice.toFixed(2);
-        const orderIdStr = order._id.toString();
-
-        const signature = generateHash(
-            `${merchantCode}${orderIdStr}${order.userSlug}${fawryMethod}${formattedAmount}${secureKey}`
-        );
-
-        const payload = {
+        const {
             merchantCode,
-            merchantRefNum: orderIdStr, 
-            customerProfileId: order.userSlug,
-            customerMobile: order.address.phone,
-            chargeItems: cart.items.map(item => ({
-                itemId: item.productSlug,
-                description: item.productSlug, 
-                price: item.price.toFixed(2),
-                quantity: item.quantity
-            })),
-            amount: formattedAmount, 
-            paymentMethod: fawryMethod,
+            secureKey,
+            merchantRefNum,
+            customerProfileId,
+            customerName,
+            customerMobile,
+            customerEmail,
+            amount,
+            description
+        } = data;
+
+        // 1. تحويل المبلغ لصيغة كسر عشري برقمين (مثال: 500.00) لأن فوري تشترط ذلك في الـ Signature والـ Body
+        const formattedAmount = Number(amount).toFixed(2);
+        const paymentMethod = "PayAtFawry";
+
+        // 2. بناء السلسلة النصية وحساب الـ Signature (SHA-256) بناءً على توثيق فوري
+        const rawSignatureString = `${merchantCode}${merchantRefNum}${customerProfileId}${paymentMethod}${formattedAmount}${secureKey}`;
+        const signature = crypto.createHash("sha256").update(rawSignatureString).digest("hex");
+
+        // 3. تجهيز الـ Payload بالكامل طبقاً لـ Sample Request الخاص بفوري
+        const paymentPayload = {
+            merchantCode,
+            merchantRefNum,
+            customerProfileId,
+            customerName,
+            customerMobile,
+            customerEmail,
+            amount: formattedAmount,
+            paymentMethod,
+            description,
+            currencyCode: "EGP",
+            language: "ar-eg", // لجعل رسائل فوري للطالب باللغة العربية
+            chargeItems: [
+                {
+                    itemId: `FEE_${merchantRefNum}`,
+                    description: description,
+                    price: formattedAmount,
+                    quantity: "1"
+                }
+            ],
             signature
         };
 
-  
-        const response = await axios.post(process.env.FAWRY_CHARGE_URL, payload);
+        // 4. إرسال الطلب إلى سيرفر Staging الخاص بفوري
+        const response = await axios.post(
+            "https://atfawry.fawrystaging.com/ECommerceWeb/Fawry/payments/charge",
+            paymentPayload
+        );
 
-        if (response.data?.statusCode === 200 || response.data?.referenceNumber) {
-            return { 
-                type: "REFERENCE_NUMBER", 
-                fawryRefNumber: response.data.referenceNumber,
-                message: "يرجى التوجه لأي كشك والدفع برقم فوري المرجعي"
-            };
-        }
-        throw new Error(response.data?.statusDescription || "فشل توليد الرقم المرجعي لفوري");
-        
+        // إرجاع البيانات المرتجعة من سيرفر فوري مباشرة
+        return response.data;
+
     } catch (error) {
-        console.error("Fawry RefNum Error Details:", error.response?.data || error.message);
-        throw new Error(error.response?.data?.statusDescription || "فشل توليد الرقم المرجعي لفوري");
-    }
-};
-
-export const processFawryPayment = async (method, order, cart) => {
-    if (method === PAYMENT_METHODS.FAWRY) {     
-        return await handleRefNumPayment(order, cart);
-    } else {
-        throw new Error("طريقة الدفع المطلوبة غير مدعومة، متاح فقط الدفع عبر كشك فوري");
+        console.error("Fawry Service Error:", error.response?.data || error.message);
+        throw new Error(error.response?.data?.statusDescription || "Fawry API Request Failed");
     }
 };

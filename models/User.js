@@ -1,39 +1,11 @@
 import mongoose from "mongoose";
+import { ROLES } from "../config/constants.js";
 
 const userSchema = new mongoose.Schema({
-    firstName: {
-        type: String,
-        required: true,
-    },
-    lastName: {
-        type: String,
-        required: true,
-    },
-    phone: {
-        type: String,
-    },
-    slug: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-    },
-    password: {
-        type: String,
-        required: true,
-        select: false,
-    },
-    role: {
-        type: String,
-        enum: ["user", "admin"],
-        default: "user",
-    },
-}, {timestamps: true});
+    name: { type: String },
+    nationalID: { type: String, required: true },
+    password: { type: String, required: true ,select: false },
+    role: { type: String, enum: Object.values(ROLES), default: ROLES.STUDENT },
+});
 
-const User = mongoose.model("User", userSchema);
-
-export default User;
+export default mongoose.model("User", userSchema);

@@ -1,34 +1,45 @@
 const ROLES = {
-    USER: "user",
+    STUDENT: "student",
     ADMIN: "admin",
 }
-const PAYMENT_METHODS = {
-    CARD: "card",
-    CASH: "cash",
-    FAWRY: "fawry",
-    E_WALLET: "ewallet",
-}
-const PAYMENT_STATUS = {
-    PAID: "paid",
-    UNPAID: "unpaid",
-}
-const ORDER_STATUS = {
-    PENDING: "pending",
-    PROCESSING: "processing",
-    SHIPPED: "shipped",
-    DELIVERED: "delivered",
-    CANCELLED: "cancelled",
+const RELATION = {
+    FATHER: "father",
+    MOTHER: "mother",
+    GUARDIAN: "guardian",
+    BROTHER: "brother",
+    SISTER: "sister",
+    UNCLE: "uncle",          
+    MATERNAL_UNCLE: "maternal_uncle",
 }
 
-const USER_STATUS = {
-    ACTIVE: "active",
-    INACTIVE: "inactive",
+const PAYMENT_STATUS = {
+    UNPAID: "UNPAID",
+    PAID: "PAID",
+}
+
+const ADMIN_STATUS = {
+    PENDING: "PENDING",
+    ACCEPTED: "ACCEPTED",
+    REJECTED: "REJECTED",
+}
+
+const PAYMENT_METHOD = {
+    FAWRY_PAY_AT_STORE: "FAWRY_PAY_AT_STORE",
+    CARD: "CARD",
+}
+
+const TRANSACTION_STATUS = {
+    PENDING: "PENDING",
+    SUCCESS: "SUCCESS",
+    FAILED: "FAILED",
+    EXPIRED: "EXPIRED",
 }
 
 export {
     ROLES,
-    PAYMENT_METHODS,
+    RELATION,
     PAYMENT_STATUS,
-    ORDER_STATUS,
-    USER_STATUS,
+    ADMIN_STATUS,
+    PAYMENT_METHOD,
+    TRANSACTION_STATUS,
 }

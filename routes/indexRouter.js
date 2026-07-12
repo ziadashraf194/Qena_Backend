@@ -1,17 +1,18 @@
 import { Router } from "express";
 import authRoutes from "./authRoutes.js";
-import categoryRoutes from "./categoryRoutes.js";
-import productRoutes from "./productRoutes.js";
-import cartRoutes from "./cartRoutes.js";
-import orderRoutes from "./orderRoutes.js";
+import studentRoutes from "./studentRouter.js";
+import facultyRoutes from "./facultyRoutes.js";
+import applicationRoutes from "./applicationRouter.js";
+import fawryRoutes from "./paymentRouter.js";
 
 const router = Router();
 
 router.use("/auth", authRoutes);
-router.use("/category", categoryRoutes);
-router.use("/product", productRoutes);
-router.use("/cart", cartRoutes);
-router.use("/order", orderRoutes);
+router.use("/student", studentRoutes);
+router.use("/faculty", facultyRoutes);
+router.use("/application", applicationRoutes);
+router.use("/fawry", fawryRoutes);
+
 
 router.get("/", (req, res) => {
     res.send("Hello World!");
